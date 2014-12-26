@@ -38,4 +38,4 @@ add :: (Num d1) => Network (d1, d1) d1
 add = merge (Prelude.+)
 
 (+) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
-(Nw f) + (Nw g) = elementWiseAdd NN.Network.. ((Nw f) |+| (Nw g))
+n + m = add NN.Network.. (n |+| m)
