@@ -16,7 +16,7 @@ class INetwork n where
 instance INetwork Network where
     fromFunc f = Nw f
     forward (Nw f) = f
-    (Nw g) . (Nw f) = fmap g (Nw f)
+    (Nw g) . (Nw f) = Nw (g Prelude.. f)
     (Nw f) |+| (Nw g) = Nw (\(x, y) -> (f x, g y))
 
 instance Functor (Network n) where
