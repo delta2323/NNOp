@@ -19,17 +19,17 @@ instance INetwork Network where
     (Nw g) . (Nw f) = Nw (g Prelude.. f)
     (Nw f) |+| (Nw g) = Nw (\(x, y) -> (f x, g y))
 
-instance Functor (Network n) where
-    fmap g (Nw f) = Nw $ g Prelude.. f
+instance Functor (Network d1) where
+    fmap g n = (fromFunc g) NN.Network.. n
 
 fc :: (Num a) => M.Matrix a -> Network (M.Matrix a) (M.Matrix a)
-fc w = Nw $ (*) w
+fc w = fromFunc $ (*) w
 
 lift :: (A.Applicative a) => Network d1 d2 -> Network (a d1) (a d2)
-lift (Nw f) = Nw $ A.liftA f
+lift (Nw f) = fromFunc $ A.liftA f
 
 elementWise :: (A.Applicative a) => (d1 -> d2) -> Network (a d1) (a d2)
-elementWise f = lift $ Nw f
+elementWise = lift Prelude.. fromFunc
 
 elementWiseAdd :: (Num d1) => Network (d1, d1) d1
 elementWiseAdd = Nw $ \(x, y) -> (x Prelude.+ y)
