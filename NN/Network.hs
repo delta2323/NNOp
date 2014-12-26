@@ -31,8 +31,11 @@ lift (Nw f) = fromFunc $ A.liftA f
 elementWise :: (A.Applicative a) => (d1 -> d2) -> Network (a d1) (a d2)
 elementWise = lift Prelude.. fromFunc
 
-elementWiseAdd :: (Num d1) => Network (d1, d1) d1
-elementWiseAdd = Nw $ \(x, y) -> (x Prelude.+ y)
+merge :: (d1 -> d2 -> d3) -> Network (d1, d2) d3
+merge = fromFunc Prelude.. uncurry
+
+add :: (Num d1) => Network (d1, d1) d1
+add = merge (Prelude.+)
 
 (+) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
 (Nw f) + (Nw g) = elementWiseAdd NN.Network.. ((Nw f) |+| (Nw g))
