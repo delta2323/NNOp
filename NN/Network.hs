@@ -3,7 +3,7 @@ module NN.Network where
 import qualified Data.Matrix as M
 import qualified Control.Applicative as A
 
-type Blob = [Float]
+type Blob a = M.Matrix a
 data Network d1 d2 = Nw (d1 -> d2)
 
 class INetwork n where
@@ -43,7 +43,7 @@ absoluter = fromFunc abs
 signer :: (Num d1) => Network d1 d1
 signer = fromFunc signum
 
-fc :: (Num a) => M.Matrix a -> Network (M.Matrix a) (M.Matrix a)
+fc :: (Num a) => Blob a -> Network (Blob a) (Blob a)
 fc w = fromFunc $ (*) w
 
 id :: Network d1 d1
@@ -52,7 +52,7 @@ id = fromFunc Prelude.id
 split :: Network d1 (d1, d1)
 split = fromFunc $ \x -> (x, x)
 
-perm :: (Num a) => Int -> Int -> Network (M.Matrix a) (M.Matrix a)
+perm :: (Num a) => Int -> Int -> Network (Blob a) (Blob a)
 perm n m = fromFunc $ \w -> (M.permMatrix (M.nrows w) n m) * w
 
 -- operation on network
