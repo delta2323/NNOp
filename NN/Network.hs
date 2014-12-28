@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module NN.Network where
 
 import qualified Data.Matrix as M
@@ -18,10 +19,10 @@ instance INetwork Network where
     (Nw g) . (Nw f) = Nw (g Prelude.. f)
     (Nw f) |+| (Nw g) = Nw (\(x, y) -> (f x, g y))
 
-instance Functor (Network d1) where
+instance (INetwork nn) => Functor (nn d1) where
     fmap g n = (fromFunc g) NN.Network.. n
 
-instance (Num d2) => Num (Network d1 d2) where
+instance (INetwork nn, Num d2) => Num (nn d1 d2) where
     n + m = adder NN.Network.. (n |+| m) NN.Network.. split
     n * m = multiplier NN.Network.. (n|+|m) NN.Network.. split
     abs n = absoluter NN.Network.. n
@@ -30,42 +31,42 @@ instance (Num d2) => Num (Network d1 d2) where
     fromInteger n = fromFunc (\_ -> fromInteger n)
 
 -- utility networks
-elementWise :: (A.Applicative a) => (d1 -> d2) -> Network (a d1) (a d2)
+elementWise :: (INetwork nn, A.Applicative a) => (d1 -> d2) -> nn (a d1) (a d2)
 elementWise = lift Prelude.. fromFunc
 
-merger :: (d1 -> d2 -> d3) -> Network (d1, d2) d3
+merger :: (INetwork nn) => (d1 -> d2 -> d3) -> nn (d1, d2) d3
 merger = fromFunc Prelude.. uncurry
 
-adder :: (Num d1) => Network (d1, d1) d1
+adder :: (INetwork nn, Num d1) => nn (d1, d1) d1
 adder = merger (Prelude.+)
 
-multiplier :: (Num d1) => Network (d1, d1) d1
+multiplier :: (INetwork nn, Num d1) => nn (d1, d1) d1
 multiplier = merger (Prelude.*)
 
-negater :: (Num d1) => Network d1 d1
+negater :: (INetwork nn, Num d1) => nn d1 d1
 negater = fromFunc negate
 
-absoluter :: (Num d1) => Network d1 d1
+absoluter :: (INetwork nn, Num d1) => nn d1 d1
 absoluter = fromFunc abs
 
-signer :: (Num d1) => Network d1 d1
+signer :: (INetwork nn, Num d1) => nn d1 d1
 signer = fromFunc signum
 
-fc :: (Num a) => Blob a -> Network (Blob a) (Blob a)
+fc :: (INetwork nn, Num a) => Blob a -> nn (Blob a) (Blob a)
 fc w = fromFunc $ (*) w
 
-id :: Network d1 d1
+id :: (INetwork nn) => nn d1 d1
 id = fromFunc Prelude.id
 
-split :: Network d1 (d1, d1)
+split :: (INetwork nn) => nn d1 (d1, d1)
 split = fromFunc $ \x -> (x, x)
 
-perm :: (Num a) => Int -> Int -> Network (Blob a) (Blob a)
+perm :: (INetwork nn, Num a) => Int -> Int -> nn (Blob a) (Blob a)
 perm n m = fromFunc $ \w -> (M.permMatrix (M.nrows w) n m) * w
 
 -- operation on network
-lift :: (A.Applicative a) => Network d1 d2 -> Network (a d1) (a d2)
+lift :: (INetwork nn, A.Applicative a) => nn d1 d2 -> nn (a d1) (a d2)
 lift = fromFunc Prelude.. A.liftA Prelude.. forward
 
-(|++|) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
+(|++|) :: (INetwork nn, Num d3) => nn d1 d3 -> nn d2 d3 -> nn (d1, d2) d3
 n |++| m = adder NN.Network.. (n |+| m)
