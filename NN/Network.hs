@@ -56,17 +56,18 @@ split = fromFunc $ \x -> (x, x)
 perm :: (Num a) => Int -> Int -> Network (M.Matrix a) (M.Matrix a)
 perm n m = fromFunc $ \w -> (M.permMatrix (M.nrows w) n m) * w
 
+-- operation on network
+
 lift :: (A.Applicative a) => Network d1 d2 -> Network (a d1) (a d2)
 lift (Nw f) = fromFunc $ A.liftA f
 
-elementWise :: (A.Applicative a) => (d1 -> d2) -> Network (a d1) (a d2)
-elementWise = lift Prelude.. fromFunc
-
-merger :: (d1 -> d2 -> d3) -> Network (d1, d2) d3
-merger = fromFunc Prelude.. uncurry
-
-add :: (Num d1) => Network (d1, d1) d1
-add = merger (Prelude.+)
+instance (Num d2) => Num (Network d1 d2) where
+    n + m = adder NN.Network.. (n |+| m) NN.Network.. split
+    n * m = multiplier NN.Network.. (n|+|m) NN.Network.. split
+    abs n = absoluter NN.Network.. n
+    signum n = signer NN.Network.. n
+    negate n = negater NN.Network.. n
+    fromInteger n = fromFunc (\_ -> fromInteger n)
 
 (+) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
 n + m = add NN.Network.. (n |+| m)
