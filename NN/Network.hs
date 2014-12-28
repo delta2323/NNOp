@@ -22,6 +22,28 @@ instance INetwork Network where
 instance Functor (Network d1) where
     fmap g n = (fromFunc g) NN.Network.. n
 
+elementWise :: (A.Applicative a) => (d1 -> d2) -> Network (a d1) (a d2)
+elementWise = lift Prelude.. fromFunc
+
+merger :: (d1 -> d2 -> d3) -> Network (d1, d2) d3
+merger = fromFunc Prelude.. uncurry
+
+-- utility networks
+adder :: (Num d1) => Network (d1, d1) d1
+adder = merger (Prelude.+)
+
+multiplier :: (Num d1) => Network (d1, d1) d1
+multiplier = merger (Prelude.*)
+
+negater :: (Num d1) => Network d1 d1
+negater = fromFunc negate
+
+absoluter :: (Num d1) => Network d1 d1
+absoluter = fromFunc abs
+
+signer :: (Num d1) => Network d1 d1
+signer = fromFunc signum
+
 fc :: (Num a) => M.Matrix a -> Network (M.Matrix a) (M.Matrix a)
 fc w = fromFunc $ (*) w
 
