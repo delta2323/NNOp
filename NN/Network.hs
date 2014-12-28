@@ -1,7 +1,6 @@
 module NN.Network where
 
 import qualified Data.Matrix as M
-import qualified Data.Vector as V
 import qualified Control.Applicative as A
 
 type Blob = [Float]

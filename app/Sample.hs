@@ -2,7 +2,6 @@ module Main where
 
 import qualified NN.Network as N
 import qualified Data.Matrix as M
-import qualified Data.Vector as V
 
 n = N.Nw (fmap (+1)) :: N.Network (M.Matrix Float) (M.Matrix Float)
 m = N.Nw (fmap (*2)) :: N.Network (M.Matrix Float) (M.Matrix Float)
