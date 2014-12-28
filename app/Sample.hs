@@ -8,7 +8,7 @@ m = N.Nw (fmap (*2)) :: N.Network (M.Matrix Float) (M.Matrix Float)
 l = m N.. n
 p = m N.|+| n
 w = M.matrix 4 3 (\(i, j) -> fromIntegral $ i+j*2)
-q = N.fc w
+q = N.fc w :: N.Network (M.Matrix Float) (M.Matrix Float)
 r = m N.|++| n
 
 x1 = M.fromList 3 1 [1, 2, 3]
