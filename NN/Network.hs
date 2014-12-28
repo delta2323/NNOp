@@ -69,5 +69,5 @@ instance (Num d2) => Num (Network d1 d2) where
     negate n = negater NN.Network.. n
     fromInteger n = fromFunc (\_ -> fromInteger n)
 
-(+) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
-n + m = add NN.Network.. (n |+| m)
+(|++|) :: (Num d3) => Network d1 d3 -> Network d2 d3 -> Network (d1, d2) d3
+n |++| m = adder NN.Network.. (n |+| m)

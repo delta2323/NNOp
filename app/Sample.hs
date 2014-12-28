@@ -10,7 +10,7 @@ l = m N.. n
 p = m N.|+| n
 w = M.matrix 4 3 (\(i, j) -> fromIntegral $ i+j*2)
 q = N.fc w
-r = m N.+ n
+r = m N.|++| n
 
 x1 = M.fromList 3 1 [1, 2, 3]
 x2 = M.fromList 3 1 [1, 2, 3]
