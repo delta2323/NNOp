@@ -25,6 +25,15 @@ instance Functor (Network d1) where
 fc :: (Num a) => M.Matrix a -> Network (M.Matrix a) (M.Matrix a)
 fc w = fromFunc $ (*) w
 
+id :: Network d1 d1
+id = fromFunc Prelude.id
+
+split :: Network d1 (d1, d1)
+split = fromFunc $ \x -> (x, x)
+
+perm :: (Num a) => Int -> Int -> Network (M.Matrix a) (M.Matrix a)
+perm n m = fromFunc $ \w -> (M.permMatrix (M.nrows w) n m) * w
+
 lift :: (A.Applicative a) => Network d1 d2 -> Network (a d1) (a d2)
 lift (Nw f) = fromFunc $ A.liftA f
 
